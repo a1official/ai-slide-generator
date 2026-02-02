@@ -1,0 +1,7 @@
+librosa
+numpy
+opencv-python
+scipy
+tqdm
+numba
+boto3

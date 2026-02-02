@@ -17,7 +17,11 @@ uploads/*
 outputs/*
 !outputs/.gitkeep
 # Large model files
-Wav2Lip/
+# Wav2Lip/  <-- Removed this to include integration scripts
+Wav2Lip/checkpoints/
+Wav2Lip/face_detection/detection/sfd/s3fd.pth
+Wav2Lip/results/
+Wav2Lip/temp/
 *.pth
 *.pt
 *.tar.gz
