@@ -94,7 +94,39 @@ class SlideGenerationAgent:
         slides = []
         
         # 1. Intro
-        slides.append(self._generate_title_slide(chunks, theme))
+        if provider in ["bedrock", "aws", "amazon_bedrock"]:
+            print("  [1] Orchestrating Premium AI Slide: Title Slide...")
+            
+            # Create a synthetic chunk for the title slide
+            title_chunk = {
+                "title": chunks[0]["title"] if chunks else "Masterclass",
+                "key_points": [
+                    "Overview of the topic",
+                    "Key concepts coverage", 
+                    "In-depth analysis"
+                ],
+                "visual_hint": "Cinematic title screen, dramatic lighting, grand entrance, high quality"
+            }
+            
+            slide_path = await self.bedrock_slide_gen.generate_slide_image(
+                chunk=title_chunk,
+                slide_num=1,
+                theme=theme_name
+            )
+            
+            if slide_path:
+                slides.append({
+                    "slide_id": 1,
+                    "type": "title",
+                    "image_path": slide_path,
+                    "title": title_chunk["title"]
+                })
+            else:
+                # Fallback if generation fails
+                slides.append(self._generate_title_slide(chunks, theme))
+        else:
+            # Existing local behavior
+            slides.append(self._generate_title_slide(chunks, theme))
         
         # 2. Content Chunks
         for idx, chunk in enumerate(chunks, start=2):
