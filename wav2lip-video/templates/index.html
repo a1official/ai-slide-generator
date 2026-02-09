@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wav2Lip Video Processing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🎬 Wav2Lip Video Processor</h1>
+                <p class="subtitle">Generate lip-synced videos with AI</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section class="upload-section" id="uploadSection">
+                <div class="card">
+                    <h2>📤 Upload Files</h2>
+                    <p class="section-description">Upload your video and audio files to generate a lip-synced video</p>
+                    
+                    <form id="uploadForm" class="upload-form">
+                        <!-- Video Upload -->
+                        <div class="file-input-group">
+                            <label for="videoFile" class="file-label">
+                                <span class="label-icon">🎥</span>
+                                <span class="label-text">Video File</span>
+                            </label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="videoFile" name="video" accept="video/*" required>
+                                <div class="file-input-display">
+                                    <span class="file-placeholder">Choose video file...</span>
+                                    <button type="button" class="browse-btn">Browse</button>
+                                </div>
+                            </div>
+                            <small class="file-hint">Supported: MP4, AVI, MOV, MKV, WebM</small>
+                        </div>
+
+                        <!-- Audio Upload -->
+                        <div class="file-input-group">
+                            <label for="audioFile" class="file-label">
+                                <span class="label-icon">🎵</span>
+                                <span class="label-text">Audio File</span>
+                            </label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="audioFile" name="audio" accept="audio/*,video/*" required>
+                                <div class="file-input-display">
+                                    <span class="file-placeholder">Choose audio file...</span>
+                                    <button type="button" class="browse-btn">Browse</button>
+                                </div>
+                            </div>
+                            <small class="file-hint">Supported: WAV, MP3, MP4, M4A, AAC</small>
+                        </div>
+
+                        <!-- Quality Selection -->
+                        <div class="quality-group">
+                            <label class="quality-label">Quality Preset</label>
+                            <div class="quality-options">
+                                <label class="quality-option">
+                                    <input type="radio" name="quality" value="low">
+                                    <span class="quality-card">
+                                        <span class="quality-name">Low</span>
+                                        <span class="quality-desc">Fast processing</span>
+                                    </span>
+                                </label>
+                                <label class="quality-option">
+                                    <input type="radio" name="quality" value="medium" checked>
+                                    <span class="quality-card">
+                                        <span class="quality-name">Medium</span>
+                                        <span class="quality-desc">Balanced</span>
+                                    </span>
+                                </label>
+                                <label class="quality-option">
+                                    <input type="radio" name="quality" value="high">
+                                    <span class="quality-card">
+                                        <span class="quality-name">High</span>
+                                        <span class="quality-desc">Best quality</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn" id="processBtn">
+                            <span class="btn-icon">✨</span>
+                            <span class="btn-text">Generate Lip-Synced Video</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Processing Section -->
+            <section class="processing-section hidden" id="processingSection">
+                <div class="card">
+                    <h2>⚙️ Processing</h2>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p class="progress-text" id="progressText">Uploading files...</p>
+                    </div>
+                    <div class="processing-steps">
+                        <div class="step" id="step1">
+                            <span class="step-icon">📤</span>
+                            <span class="step-text">Uploading files</span>
+                        </div>
+                        <div class="step" id="step2">
+                            <span class="step-icon">🔍</span>
+                            <span class="step-text">Detecting faces</span>
+                        </div>
+                        <div class="step" id="step3">
+                            <span class="step-icon">🎨</span>
+                            <span class="step-text">Generating lip sync</span>
+                        </div>
+                        <div class="step" id="step4">
+                            <span class="step-icon">🎬</span>
+                            <span class="step-text">Finalizing video</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Result Section -->
+            <section class="result-section hidden" id="resultSection">
+                <div class="card">
+                    <h2>✅ Video Generated!</h2>
+                    <p class="success-message">Your lip-synced video is ready</p>
+                    
+                    <!-- Video Player -->
+                    <div class="video-container">
+                        <video id="resultVideo" controls>
+                            <source id="videoSource" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a id="downloadBtn" class="action-btn primary" download>
+                            <span class="btn-icon">⬇️</span>
+                            <span class="btn-text">Download Video</span>
+                        </a>
+                        <button class="action-btn secondary" onclick="resetForm()">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">Process Another</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Section -->
+            <section class="error-section hidden" id="errorSection">
+                <div class="card error-card">
+                    <h2>❌ Error</h2>
+                    <p class="error-message" id="errorMessage"></p>
+                    <button class="action-btn secondary" onclick="resetForm()">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-text">Try Again</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Previous Outputs -->
+            <section class="outputs-section">
+                <div class="card">
+                    <h2>📁 Recent Outputs</h2>
+                    <div id="outputsList" class="outputs-list">
+                        <p class="loading-text">Loading...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by Wav2Lip • Built with ❤️</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

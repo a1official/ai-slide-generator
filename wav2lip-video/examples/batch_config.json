@@ -1,0 +1,20 @@
+{
+  "output_dir": "outputs/batch_results",
+  "quality": "medium",
+  "videos": [
+    {
+      "face_video": "examples/person1.mp4",
+      "audio": "examples/speech1.wav",
+      "output_name": "person1_lipsynced.mp4"
+    },
+    {
+      "face_video": "examples/person2.mp4",
+      "audio": "examples/speech2.wav",
+      "output_name": "person2_lipsynced.mp4",
+      "params": {
+        "resize_factor": 1,
+        "face_det_batch_size": 32
+      }
+    }
+  ]
+}

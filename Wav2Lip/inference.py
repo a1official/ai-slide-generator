@@ -21,7 +21,11 @@ parser.add_argument('--outfile', type=str, help='Video path to save result. See 
 								default='results/result_voice.mp4')
 
 import shutil
-FFMPEG_PATH = shutil.which("ffmpeg") or "ffmpeg"
+try:
+    import imageio_ffmpeg
+    FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
+except ImportError:
+    FFMPEG_PATH = shutil.which("ffmpeg") or "ffmpeg"
 
 parser.add_argument('--static', type=bool, 
 					help='If True, then use only first video frame for inference', default=False)
@@ -162,10 +166,11 @@ print('Using {} for inference.'.format(device))
 
 def _load(checkpoint_path):
 	if device == 'cuda':
-		checkpoint = torch.load(checkpoint_path)
+		checkpoint = torch.load(checkpoint_path, weights_only=False)
 	else:
 		checkpoint = torch.load(checkpoint_path,
-								map_location=lambda storage, loc: storage)
+								map_location=lambda storage, loc: storage,
+								weights_only=False)
 	return checkpoint
 
 def load_model(path):

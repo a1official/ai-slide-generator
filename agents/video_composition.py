@@ -108,6 +108,8 @@ class VideoCompositionAgent:
         """
         import subprocess
         import tempfile
+        import imageio_ffmpeg
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
         
         print("[1/3] Creating individual slide clips with FFmpeg...")
         slide_video_paths = []
@@ -154,7 +156,7 @@ class VideoCompositionAgent:
                 )
                 
                 ffmpeg_cmd = [
-                    'ffmpeg', '-y',
+                    ffmpeg_exe, '-y',
                     '-loop', '1', '-framerate', '25', '-i', str(image_path),
                     '-stream_loop', '-1', '-i', str(avatar_path), # Loop avatar if shorter
                     '-i', str(audio_path),
@@ -178,7 +180,7 @@ class VideoCompositionAgent:
             else:
                 # Original logic for image + audio only
                 ffmpeg_cmd = [
-                    'ffmpeg', '-y',
+                    ffmpeg_exe, '-y',
                     '-loop', '1', '-framerate', '25', '-i', str(image_path),
                     '-i', str(audio_path),
                     '-c:v', 'libx264',
@@ -225,7 +227,7 @@ class VideoCompositionAgent:
         if len(slide_video_paths) == 1:
             # Single video, just copy
             concat_cmd = [
-                'ffmpeg', '-y',
+                ffmpeg_exe, '-y',
                 '-i', slide_video_paths[0],
                 '-c', 'copy',
                 str(output_path)
@@ -245,7 +247,7 @@ class VideoCompositionAgent:
             filter_str = f"{''.join(filter_parts)}concat=n={len(slide_video_paths)}:v=1:a=1[outv][outa]"
             
             concat_cmd = [
-                'ffmpeg', '-y',
+                ffmpeg_exe, '-y',
                 *input_args,
                 '-filter_complex', filter_str,
                 '-map', '[outv]',
@@ -321,6 +323,8 @@ class VideoCompositionAgent:
             has_avatar = avatar and Path(avatar["avatar_video"]).exists()
             
             import subprocess
+            import imageio_ffmpeg
+            ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
             if has_avatar:
                 avatar_path = avatar["avatar_video"]
                 x_pos = self.width - self.avatar_size - self.avatar_margin
@@ -332,7 +336,7 @@ class VideoCompositionAgent:
                 )
                 
                 cmd = [
-                    'ffmpeg', '-y', '-loop', '1', '-i', slide["image_path"],
+                    ffmpeg_exe, '-y', '-loop', '1', '-i', slide["image_path"],
                     '-stream_loop', '-1', '-i', str(avatar_path),
                     '-i', audio["audio_path"], 
                     '-filter_complex', filter_complex,
@@ -341,7 +345,7 @@ class VideoCompositionAgent:
                 ]
             else:
                 cmd = [
-                    'ffmpeg', '-y', '-loop', '1', '-i', slide["image_path"],
+                    ffmpeg_exe, '-y', '-loop', '1', '-i', slide["image_path"],
                     '-i', audio["audio_path"], '-c:v', 'libx264', '-t', str(audio["duration"]),
                     '-pix_fmt', 'yuv420p', '-shortest', str(local_segment)
                 ]

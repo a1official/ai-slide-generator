@@ -234,14 +234,17 @@ class AvatarAgent:
         # Build command
         import sys
         
-        # Add FFmpeg to path if possible (to help librosa/audioread)
-        import shutil
-        ffmpeg_path = shutil.which("ffmpeg")
+        # Add FFmpeg to path (using imageio-ffmpeg bundled binary)
+        import imageio_ffmpeg
         env = os.environ.copy()
-        if ffmpeg_path:
-            ffmpeg_dir = str(Path(ffmpeg_path).parent)
+        try:
+            ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+            ffmpeg_dir = str(Path(ffmpeg_exe).parent)
             if ffmpeg_dir not in env.get("PATH", ""):
-                env["PATH"] = f"{ffmpeg_dir};" + env.get("PATH", "")
+                # Use : separator on Unix-like systems
+                env["PATH"] = f"{ffmpeg_dir}:{env.get('PATH', '')}"
+        except Exception as e:
+            print(f"  ⚠ Could not locate FFmpeg binary: {e}")
 
         cmd = [
             sys.executable,
