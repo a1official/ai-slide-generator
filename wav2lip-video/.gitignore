@@ -1,0 +1,4 @@
+ai-slide-generator/wav2lip-video/.gitignore
+uploads/
+temp/
+outputs/

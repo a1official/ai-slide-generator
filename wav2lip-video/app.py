@@ -151,7 +151,14 @@ def process_video():
         output_path = os.path.join(OUTPUT_FOLDER, output_filename)
         
         # Get quality parameters
-        params = config.QUALITY_PRESETS.get(quality, config.QUALITY_PRESETS['medium'])
+        params = config.QUALITY_PRESETS.get(quality, config.QUALITY_PRESETS['medium']).copy()
+        
+        # 🚀 OPTIMIZATION: Enable static mode by default for massive speed improvement
+        params['static'] = True
+        
+        # 🎨 QUALITY: Improve output quality
+        params['output_quality'] = 1  # Best quality (1 = best, 31 = worst)
+        params['wav2lip_batch_size'] = 128  # Larger batch for better quality
         
         # Process video
         proc = get_processor()

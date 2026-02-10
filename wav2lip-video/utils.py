@@ -116,7 +116,7 @@ def get_smoothened_boxes(boxes: np.ndarray, T: int = 5) -> np.ndarray:
 
 def merge_audio_video(video_path: str, audio_path: str, output_path: str, quality: int = 1) -> bool:
     """
-    Merge audio and video files using FFmpeg
+    Merge audio and video files using FFmpeg with HD quality settings
     
     Args:
         video_path: Path to video file
@@ -128,9 +128,29 @@ def merge_audio_video(video_path: str, audio_path: str, output_path: str, qualit
         True if successful, False otherwise
     """
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    command = f'"{FFMPEG_PATH}" -y -i "{audio_path}" -i "{video_path}" -strict -2 -q:v {quality} "{output_path}"'
     
-    print(f"Merging audio and video: {command}")
+    # HD Quality FFmpeg settings
+    # -c:v libx264: Use H.264 codec (better quality than default)
+    # -preset slow: Better compression (slower but higher quality)
+    # -crf 18: Constant Rate Factor (18 = visually lossless, 23 = default)
+    # -pix_fmt yuv420p: Pixel format for compatibility
+    # -c:a aac: AAC audio codec
+    # -b:a 192k: Audio bitrate
+    command = (
+        f'"{FFMPEG_PATH}" -y '
+        f'-i "{audio_path}" '
+        f'-i "{video_path}" '
+        f'-c:v libx264 '
+        f'-preset slow '
+        f'-crf 18 '
+        f'-pix_fmt yuv420p '
+        f'-c:a aac '
+        f'-b:a 192k '
+        f'-movflags +faststart '
+        f'"{output_path}"'
+    )
+    
+    print(f"Merging audio and video with HD settings...")
     ret = subprocess.call(command, shell=True)
     
     if ret != 0:
